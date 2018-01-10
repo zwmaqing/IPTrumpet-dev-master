@@ -1,0 +1,236 @@
+* {
+    margin: 0;
+    padding: 0;
+}
+
+html,
+body,
+#app,
+.wrapper {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+}
+
+body {
+    font-family: "Helvetica Neue", Helvetica, "microsoft yahei", arial, STHeiTi, sans-serif;
+}
+
+a {
+    text-decoration: none
+}
+
+.content {
+    background: none repeat scroll 0 0 #fff;
+    position: absolute;
+    left: 11.25em;
+    right: 0em;
+    top: 3.125em;
+    bottom: 3.75em;
+    width: auto;
+    padding: 0.15em;
+    box-sizing: border-box;
+    /*overflow-y: scroll;*/
+}
+
+.full {
+    width: 100%;
+    height: 100%;
+}
+
+.el-popover {
+    padding: 5px;
+}
+
+.crumbs {
+    margin-bottom: 20px;
+}
+
+.pagination {
+    margin: 1.25em 0em;
+    text-align: right;
+}
+
+.miPadding span{
+    padding: 8px 1px!important;
+}
+
+.plugins-tips {
+    padding: 1.25em 1.25em;
+    margin-bottom: 1.25em;
+}
+
+.el-button+.el-tooltip {
+    margin-left: 0.625em;
+}
+
+.el-table td,
+.el-table th {
+    padding: 2px 2px;
+}
+
+.el-table .cell {
+    padding-left: 5px;
+    padding-right: 5px;
+}
+
+tr.el-table__row.task-runing {
+    background: turquoise;
+}
+
+tr.el-table__row.task-invalid {
+    background: silver;
+}
+
+.form-item-full .el-form-item__content {
+    display: inline;
+}
+
+.week-group .el-checkbox-button__inner {
+    padding: 10px 4px;
+}
+
+
+.model-group .el-checkbox-button__inner {
+    padding: 10px 4px;
+}
+
+.el-message-box {
+    display: inline-block;
+    /* width: 420px; */
+    padding-bottom: 10px;
+    vertical-align: middle;
+    background-color: #fff;
+    border-radius: 4px;
+    border: 1px solid #e6ebf5;
+    font-size: 18px;
+    -webkit-box-shadow: 0 2px 12px 0 rgba(0,0,0,.1);
+    box-shadow: 0 2px 12px 0 rgba(0,0,0,.1);
+    text-align: left;
+    overflow: hidden;
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+}
+
+/* .taskInfoInput .el-form-item {
+    width: 100%;
+}
+
+.el-form-item .el-form-item__content {
+    width: 100%;
+} */
+
+.mgb20 {
+    margin-bottom: 20px;
+}
+
+.move-enter-active,
+.move-leave-active {
+    transition: opacity .5s;
+}
+
+.move-enter,
+.move-leave {
+    opacity: 0;
+}
+
+
+/*BaseForm*/
+
+.form-box {
+    width: 600px;
+}
+
+.form-box .line {
+    text-align: center;
+}
+
+.el-time-panel__content::after,
+.el-time-panel__content::before {
+    margin-top: -7px;
+}
+
+
+/*Readme*/
+
+.ms-doc .el-checkbox__input.is-disabled+.el-checkbox__label {
+    color: #333;
+    cursor: pointer;
+}
+
+
+/*Upload*/
+
+.pure-button {
+    width: 150px;
+    height: 40px;
+    line-height: 40px;
+    text-align: center;
+    color: #fff;
+    border-radius: 3px;
+}
+
+.g-core-image-corp-container .info-aside {
+    height: 45px;
+}
+
+.el-upload--text {
+    background-color: #fff;
+    border: 1px dashed #d9d9d9;
+    border-radius: 6px;
+    box-sizing: border-box;
+    width: 360px;
+    height: 180px;
+    text-align: center;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+}
+
+.el-upload--text .el-icon-upload {
+    font-size: 67px;
+    color: #97a8be;
+    margin: 40px 0 16px;
+    line-height: 50px;
+}
+
+.el-upload--text {
+    color: #97a8be;
+    font-size: 14px;
+    text-align: center;
+}
+
+.el-upload--text em {
+    font-style: normal;
+}
+
+
+/*VueEditor*/
+
+.ql-container {
+    min-height: 400px;
+}
+
+.ql-snow .ql-tooltip {
+    transform: translateX(117.5px) translateY(10px) !important;
+}
+
+.editor-btn {
+    margin-top: 20px;
+}
+
+.el-submenu .el-menu-item {
+    height: 50px;
+    line-height: 50px;
+    padding: 0 45px;
+    min-width: 110px;
+}
+
+.el-menu-item,
+.el-submenu__title {
+    padding: 0 5px 0 10px;
+}
+
+.el-input-number {
+    width: 110px;
+}
