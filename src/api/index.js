@@ -7,21 +7,21 @@ import {
 // axios 配置
 //axios.defaults.timeout = 5000;
 //axios.defaults.baseURL = 'http://localhost:3000';
-axios.defaults.baseURL = 'http://192.168.10.189';
+axios.defaults.baseURL = '';
 
 // 创建实例时设置配置的默认值
 var instance = axios.create({
-  baseURL: 'http://192.168.10.106',
+  baseURL: 'http://192.168.10.133',
   timeout: 3000
 });
 
 var instanceSync = axios.create({
-  baseURL: 'http://192.168.10.106',
+  baseURL: 'http://192.168.10.133',//http://192.168.10.106
   timeout: 3000,
 });
 
 var instUpgrade = axios.create({
-  baseURL: 'http://netpower.oss-cn-hangzhou.aliyuncs.com/Upgrade/update.json',
+  baseURL: 'http://ipbroadcast.oss-cn-hangzhou.aliyuncs.com/Upgrade/update.json',
   timeout: 3000,
 });
 //http://netpower.oss-cn-hangzhou.aliyuncs.com/Upgrade/update.json

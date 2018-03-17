@@ -155,6 +155,7 @@ export default {
       isAddNewTask: false, //可以考虑取消，通过theTask 的TaskID为0判断
       isProjectLoading: false,
       isShowTaskEdit: false,
+      isTaskChanged: false,
       checkList: [],
       theTaskData: {
         TaskID: 0,
@@ -187,7 +188,7 @@ export default {
       tasks: "tasks",
       taskTotal: "taskTotal",
       taskPageIndex: "taskPageIndex",
-      isTaskRefresh: "isTaskRefresh",
+      isTaskRefresh: "isTaskRefresh"
     }),
     taskListHeighX() {
       let height = this.screenHeight - 117;
@@ -365,6 +366,15 @@ export default {
     },
     startOrStopTask(row) {
       this.getSelectTaskData(row);
+      if (this.isPcDev) {
+        this.loardTaskProject("1-16");
+        if (this.getProListCapacity() > 16 && this.theTaskData.Projects > 16) {
+          setTimeout(() => {
+            this.loardTaskProject("17-32");
+            //this.projectLoadMore("Bottom");
+          }, 2500);
+        }
+      }
       switch (row.Status) {
         case "Running": {
           //实际停止操作
@@ -393,15 +403,28 @@ export default {
     },
     editTask(row) {
       this.getSelectTaskData(row);
-      let message = this.theTaskData.IsSystem ? "系统默认任务不能编辑修改." : "";
+      let message = this.theTaskData.IsSystem
+        ? "系统默认任务不能编辑修改."
+        : "";
       message =
-        this.theTaskData.Status == "Runing" ? "任务正在执行,不能编辑修改,请停止后更改." : message;
+        this.theTaskData.Status == "Runing"
+          ? "任务正在执行,不能编辑修改,请停止后更改."
+          : message;
       if (this.theTaskData.IsSystem || this.theTaskData.Status == "Runing") {
         this.$message({
           message: message,
           type: "warning"
         });
         return;
+      }
+      if (this.isMobileDev) {
+        this.loardTaskProject("1-16");
+        if (this.getProListCapacity() > 16 && this.theTaskData.Projects > 16) {
+          setTimeout(() => {
+            this.loardTaskProject("17-32");
+            //this.projectLoadMore("Bottom");
+          }, 2500);
+        }
       }
       this.isEditDisabled = false;
       if (this.isMobileDev) {
@@ -523,13 +546,6 @@ export default {
           });
           return;
         }
-        if (this.theTaskData.GroupList.length < 1) {
-          this.$message({
-            message: "警告哦，至少需要现在一个输出分区或分组!",
-            type: "warning"
-          });
-          return;
-        }
 
         let timeSpanMS =
           this.theTaskData.TimeValue[1].getTime() -
@@ -567,13 +583,16 @@ export default {
           this.isReloginToDev(res);
           this.$message({
             showClose: true,
-            message: "保存定时任务" + (res.Status ? "成功." : "失败!请检查后重试."),
+            message:
+              "保存定时任务" + (res.Status ? "成功." : "失败!请检查后重试."),
             type: res.Status ? "success" : "warning"
           });
           //成功状态
           if (res.Status) {
+            this.isTaskChanged = true;
             this.isEditDisabled = true;
             this.isAddNewTask = false;
+            this.returnTask();//如果是手机等小屏浏览，返回任务列表再刷新
             this.getTasksTotal();
             this.getTasks({ range: "1-12" });
             if (this.getTaskListCapacity() > 12 && this.taskTotal > 12) {
@@ -582,7 +601,7 @@ export default {
               }, 2500);
             }
 
-            this.theTaskData = this.getNewTask();
+            //this.theTaskData = this.getNewTask();
           }
         });
       } else {
@@ -618,9 +637,14 @@ export default {
       api.Task(params).then(res => {
         res.$router = this.$router;
         this.isReloginToDev(res);
+        if (res.Status) {
+          this.theTaskProjects.splice(row.Index - 1, 1);
+        }
+
         this.$message({
           showClose: true,
-          message: "删除任务项目" + (res.Status ? "成功." : "失败!请检查后重试."),
+          message:
+            "删除任务项目" + (res.Status ? "成功." : "失败!请检查后重试."),
           type: res.Status ? "success" : "warning"
         });
       });

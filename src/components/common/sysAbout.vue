@@ -112,7 +112,7 @@ export default {
         //let version = res.SoftwareVersion.split(".");
         this.NewSoftwareVersion = res.SoftwareVersion;
         if (this.SoftwareVersion !== res.SoftwareVersion) {
-          //console.log(res.SoftwareVersion);
+          console.log(res.SoftwareVersion);
           this.isAllowUpdate = true;
         }
       });

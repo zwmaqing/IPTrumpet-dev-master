@@ -2,7 +2,7 @@
     <div class="login-wrap">
         <!-- <img class="user-logo" src="../../static/img/zwSound-d.png"> -->
         <div class="ms-title">
-            IP音频播放器-管理系统-Dev</div>
+            网络音频播放器管理后台-Dev</div>
         <div class="ms-login">
             <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="0px" class="demo-ruleForm">
                 <el-form-item prop="userName">
@@ -30,7 +30,7 @@ import { MessageBox } from "element-ui";
 export default {
   data() {
     return {
-      notice: "提示 : 用户名 admin,密码123456。",
+      notice: "提示 : 默认用户名 admin,密码123456。",
       ruleForm: {
         userName: "",
         password: ""
