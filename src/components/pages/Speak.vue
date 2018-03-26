@@ -31,10 +31,13 @@
         <el-dialog title="播报参数设置" :visible.sync="ttsSetFormVisible">
           <el-form :model="ttsSetting">
             <el-form-item label="播报音量" :label-width="ttsSetLabelWidth">
-              <el-slider v-model="ttsSetting.Volume" :max="16"></el-slider>
+              <el-slider v-model="ttsSetting.Volume" :max="10"></el-slider>
             </el-form-item>
             <el-form-item label="播报语速" :label-width="ttsSetLabelWidth">
               <el-slider v-model="ttsSetting.Speed" :max="10"></el-slider>
+            </el-form-item>
+            <el-form-item label="播报语调" :label-width="ttsSetLabelWidth">
+              <el-slider v-model="ttsSetting.Pitch" :max="10"></el-slider>
             </el-form-item>
           </el-form>
           <div slot="footer" class="dialog-footer">
@@ -76,293 +79,291 @@
 
 
 <script>
-  import {
-    mapGetters,
-    mapActions
-  } from "vuex";
-  import api from "../../api";
-  import * as _ from "../../util/tools"; //
-  import Vue from "vue";
+import { mapGetters, mapActions } from "vuex";
+import api from "../../api";
+import * as _ from "../../util/tools"; //
+import Vue from "vue";
 
-  export default {
-    components: {},
-    data() {
-      return {
-        isTaskRuning: true,
-        playing: false,
-        playStatus: "playing",
-        ttsSetting: {
-          roles: [{
-              value: "women",
-              label: "成年女声"
-            },
-            {
-              value: "man",
-              label: "成年男士",
-              disabled: true
-            },
-            {
-              value: "girl",
-              label: "童声女孩",
-              disabled: true
-            }
-          ],
-          Volume: 12,
-          Speed: 4
-        },
-        ttsSetFormVisible: false,
-        ttsSetLabelWidth: "80px",
-        speakData: {
-          speakContent: "",
-          role: "women"
-        },
-        fastbuttons: [{
-            label: "快捷按键1",
-            butID: "102",
-            txt: "播报内容尚未配置"
+export default {
+  components: {},
+  data() {
+    return {
+      isTaskRuning: true,
+      playing: false,
+      playStatus: "playing",
+      ttsSetting: {
+        roles: [
+          {
+            value: "women",
+            label: "成年女声"
           },
           {
-            label: "快捷按键2",
-            butID: "103",
-            txt: "播报内容尚未配置"
+            value: "man",
+            label: "成年男士"
           },
           {
-            label: "快捷按键3",
-            butID: "104",
-            txt: "播报内容尚未配置"
-          },
-          {
-            label: "快捷按键4",
-            butID: "105",
-            txt: "播报内容尚未配置"
+            value: "girl",
+            label: "童声女孩"
           }
         ],
-        spaekHistory: [{
-            logID: 1,
-            txt: "各班老师，请于下午2点到会议室开会"
-          },
-          {
-            logID: 2,
-            txt: "大一班老师，请现在到操场准备布置活动现场"
-          }
-        ],
-        isUserFireAlarm: false
-      };
-    },
-    computed: {
-      ...mapGetters({
-        screenWidth: "screenWidth",
-        screenHeight: "screenHeight",
-        isMobileDev: "isMobileDev",
-        isPcDev: "isPcDev",
-        isLogin: "isLogin",
-        tokenStr: "tokenStr"
-      })
-    },
-    mounted() {},
-    methods: {
-      ...mapActions(["setPath"]),
-      collectQuickSpeak() {
-        this.$message({
-          showClose: true,
-          message: "收藏到快捷播报成功.",
-          type: "success"
-        });
+        Volume: 8,
+        Speed: 4,
+        Pitch: 5
       },
-      speakInputTxt() {
-        if (this.speakData.speakContent.length < 1) {
+      ttsSetFormVisible: false,
+      ttsSetLabelWidth: "80px",
+      speakData: {
+        speakContent: "",
+        role: "women"
+      },
+      fastbuttons: [
+        {
+          label: "快捷按键1",
+          butID: "102",
+          txt: "播报内容尚未配置"
+        },
+        {
+          label: "快捷按键2",
+          butID: "103",
+          txt: "播报内容尚未配置"
+        },
+        {
+          label: "快捷按键3",
+          butID: "104",
+          txt: "播报内容尚未配置"
+        },
+        {
+          label: "快捷按键4",
+          butID: "105",
+          txt: "播报内容尚未配置"
+        }
+      ],
+      spaekHistory: [
+        {
+          logID: 1,
+          txt: "各班老师，请于下午2点到会议室开会"
+        },
+        {
+          logID: 2,
+          txt: "大一班老师，请现在到操场准备布置活动现场"
+        }
+      ],
+      isUserFireAlarm: false
+    };
+  },
+  computed: {
+    ...mapGetters({
+      screenWidth: "screenWidth",
+      screenHeight: "screenHeight",
+      isMobileDev: "isMobileDev",
+      isPcDev: "isPcDev",
+      isLogin: "isLogin",
+      tokenStr: "tokenStr"
+    })
+  },
+  mounted() {},
+  methods: {
+    ...mapActions(["setPath"]),
+    collectQuickSpeak() {
+      this.$message({
+        showClose: true,
+        message: "收藏到快捷播报成功.",
+        type: "success"
+      });
+    },
+    speakInputTxt() {
+      if (this.speakData.speakContent.length < 1) {
+        this.$message({
+          message: "请输入播报的文字内容",
+          type: "warning"
+        });
+        return;
+      }
+      this.speakTxtTTS(this.speakData.speakContent);
+      //检查缓存有没有，没有则添加到浏览器缓存，以用于历史记录
+    },
+    speakTxtTTS(content) {
+      let params = {
+        CMD: "SpeakTTS",
+        Content: content, //this.speakData.speakContent,
+        Volume: this.ttsSetting.Volume,
+        Speed: this.ttsSetting.Speed,
+        Role: this.speakData.role,
+        Pitch: this.ttsSetting.Pitch,
+        Token: this.tokenStr
+      };
+      api.Speak(params).then(res => {
+        if (res.Status) {
           this.$message({
-            message: "请输入播报的文字内容",
+            showClose: true,
+            message: "播报请求已成功提交",
+            type: "success"
+          });
+        } else {
+          this.$message({
+            message: "播报请求提交失败！请检查后重试。",
             type: "warning"
           });
-          return;
         }
-        this.speakTxtTTS(this.speakData.speakContent);
-        //检查缓存有没有，没有则添加到浏览器缓存，以用于历史记录
-      },
-      speakTxtTTS(content) {
-        let params = {
-          CMD: "SpeakTTS",
-          Content: content, //this.speakData.speakContent,
-          Volume: this.ttsSetting.Volume,
-          Speed: this.ttsSetting.Speed,
-          Role: this.speakData.role,
-          Token: this.tokenStr
-        };
-        api.Speak(params).then(res => {
-          if (res.Status) {
-            this.$message({
-              showClose: true,
-              message: "播报请求已成功提交",
-              type: "success"
-            });
-          } else {
-            this.$message({
-              message: "播报请求提交失败！请检查后重试。",
-              type: "warning"
-            });
-          }
-        });
-      },
-      userFireAlarm() {
-        let params = {
-          CMD: this.isUserFireAlarm ? "StopFireAlarm" : "FireAlarm",
-          Token: this.tokenStr
-        };
-        api.Speak(params).then(res => {
-          if (res.Status) {
-            if (params.CMD === "FireAlarm") {
-              this.isUserFireAlarm = true;
-            } else {
-              this.isUserFireAlarm = false;
-            }
-            this.$message({
-              showClose: true,
-              message: "播报请求已成功提交",
-              type: "success"
-            });
-          } else {
-            this.$message({
-              message: "播报请求提交失败！请检查后重试。",
-              type: "warning"
-            });
-          }
-        });
-      },
-      closeDoor() {
-        this.speakTxtTTS("即将关闭大门,听到广播后请尽快离开");
-      },
-      speakTime() {
-        let time = new Date();
-        let timeStr = "现在时间 " + time.getHours() + "点 " + time.getMinutes() + "分";
-        this.speakTxtTTS(timeStr);
-      },
-      playground() {
-        this.speakTxtTTS("请注意 听到广播后立即到操场集合");
-      },
-      repareMeal() {
-        this.speakTxtTTS("即将到用餐时间,请尽快做好用餐准备");
-      },
-      readyLeave() {
-        this.speakTxtTTS("即将放学,听到广播后请尽快做好放学准备");
-      },
-      lineUpToRemind() {
-        this.speakTxtTTS("欢迎各位家长，请自觉排队不要拥挤,谢谢大家");
-        var dd = {
-          "Accept": false,
-          "SN": "35346548uhghj547hf",
-          "Serial":21132,
-          "DelayMs":5500
-        }
-
-      },
-      classSpeakDemo() {
-        let params = {
-          CMD: "SpeakStudent",
-          ClassID: 11449,
-          Content: "王丽丽再见",
-          Token: this.tokenStr
-        };
-        api.Class(params).then(res => {
-          if (res.Status) {
-            this.$message({
-              showClose: true,
-              message: "播报请求已成功提交",
-              type: "success"
-            });
-          }
-        });
-      },
-      fastSpaekButton(but) {
-        this.$message({
-          showClose: true,
-          message: "播报请求: " + but.txt,
-          type: "success"
-        });
-      },
-      rowClick(row, event, column) {},
-      speakHistoricalRecord(row) {
-        this.speakTxtTTS(row.txt);
-      },
-      speakHistoricalEdit() {
-        this.$message({
-          showClose: true,
-          message: "此播报的功能数据接口已禁用.",
-          type: "warning"
-        });
-      },
-      speakHistoricalDel() {
-        this.$message({
-          showClose: true,
-          message: "此播报的功能数据接口已禁用.",
-          type: "warning"
-        });
-      },
-      longTimeTest() {}
+      });
     },
-    watch: {},
-    created() {
-      //组件创建完后
-      //在此触发隐藏Playbar  显示Speak按钮
-      this.setPath("speak");
-    }
-  };
-
+    userFireAlarm() {
+      let params = {
+        CMD: this.isUserFireAlarm ? "StopFireAlarm" : "FireAlarm",
+        Token: this.tokenStr
+      };
+      api.Speak(params).then(res => {
+        if (res.Status) {
+          if (params.CMD === "FireAlarm") {
+            this.isUserFireAlarm = true;
+          } else {
+            this.isUserFireAlarm = false;
+          }
+          this.$message({
+            showClose: true,
+            message: "播报请求已成功提交",
+            type: "success"
+          });
+        } else {
+          this.$message({
+            message: "播报请求提交失败！请检查后重试。",
+            type: "warning"
+          });
+        }
+      });
+    },
+    closeDoor() {
+      this.speakTxtTTS("即将关闭大门,听到广播后请尽快离开");
+    },
+    speakTime() {
+      let time = new Date();
+      let timeStr =
+        "现在时间 " + time.getHours() + "点 " + time.getMinutes() + "分";
+      this.speakTxtTTS(timeStr);
+    },
+    playground() {
+      this.speakTxtTTS("请注意 听到广播后立即到操场集合");
+    },
+    repareMeal() {
+      this.speakTxtTTS("即将到用餐时间,请尽快做好用餐准备");
+    },
+    readyLeave() {
+      this.speakTxtTTS("即将放学,听到广播后请尽快做好放学准备");
+    },
+    lineUpToRemind() {
+      this.speakTxtTTS("欢迎各位家长，请自觉排队不要拥挤,谢谢大家");
+      var dd = {
+        Accept: false,
+        SN: "35346548uhghj547hf",
+        Serial: 21132,
+        DelayMs: 5500
+      };
+    },
+    classSpeakDemo() {
+      let params = {
+        CMD: "SpeakStudent",
+        ClassID: 11449,
+        Content: "王丽丽再见",
+        Token: this.tokenStr
+      };
+      api.Class(params).then(res => {
+        if (res.Status) {
+          this.$message({
+            showClose: true,
+            message: "播报请求已成功提交",
+            type: "success"
+          });
+        }
+      });
+    },
+    fastSpaekButton(but) {
+      this.$message({
+        showClose: true,
+        message: "播报请求: " + but.txt,
+        type: "success"
+      });
+    },
+    rowClick(row, event, column) {},
+    speakHistoricalRecord(row) {
+      this.speakTxtTTS(row.txt);
+    },
+    speakHistoricalEdit() {
+      this.$message({
+        showClose: true,
+        message: "此播报的功能数据接口已禁用.",
+        type: "warning"
+      });
+    },
+    speakHistoricalDel() {
+      this.$message({
+        showClose: true,
+        message: "此播报的功能数据接口已禁用.",
+        type: "warning"
+      });
+    },
+    longTimeTest() {}
+  },
+  watch: {},
+  created() {
+    //组件创建完后
+    //在此触发隐藏Playbar  显示Speak按钮
+    this.setPath("speak");
+  }
+};
 </script>
 
 <style lang="scss" scoped>
-  .Grid {
-    display: -webkit-flex;
+.Grid {
+  display: -webkit-flex;
+  display: flex;
+  width: 100%;
+  height: 100%;
+  .Grid-cell.u-1of2 {
     display: flex;
-    width: 100%;
-    height: 100%;
-    .Grid-cell.u-1of2 {
-      display: flex;
-      flex: 0 0 50%;
-      flex-direction: column;
-    }
-    .Grid-cell.u-1of1 {
-      display: flex;
-      flex: 0 0 100%;
-      flex-direction: column;
-    }
+    flex: 0 0 50%;
+    flex-direction: column;
   }
-
-  #spaekIn {
-    .el-form-item {
-      margin-bottom: 12px;
-    }
+  .Grid-cell.u-1of1 {
+    display: flex;
+    flex: 0 0 100%;
+    flex-direction: column;
   }
+}
 
-  #fastSpaek {
-    background-color: #f8f8ff;
-    position: relative;
-    flex: 1;
-    overflow: auto;
+#spaekIn {
+  .el-form-item {
+    margin-bottom: 12px;
   }
+}
 
-  #styleDefW .el-select {
-    width: 100%;
+#fastSpaek {
+  background-color: #f8f8ff;
+  position: relative;
+  flex: 1;
+  overflow: auto;
+}
+
+#styleDefW .el-select {
+  width: 100%;
+}
+
+#styleDefW1 .el-select {
+  width: 70%;
+}
+
+#fastSpaek .el-button {
+  margin: 4px 1px;
+  padding: 8px 10px;
+}
+
+.cell {
+  .el-button + .el-button {
+    margin-left: 0px;
   }
-
-  #styleDefW1 .el-select {
-    width: 70%;
+  .el-button--small {
+    padding: 10px 4px;
+    font-size: 12px;
+    border-radius: 3px;
   }
-
-  #fastSpaek .el-button {
-    margin: 4px 1px;
-    padding: 8px 10px;
-  }
-
-  .cell {
-    .el-button+.el-button {
-      margin-left: 0px;
-    }
-    .el-button--small {
-      padding: 10px 4px;
-      font-size: 12px;
-      border-radius: 3px;
-    }
-  }
-
+}
 </style>

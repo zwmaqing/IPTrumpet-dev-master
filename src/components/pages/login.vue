@@ -2,7 +2,7 @@
     <div class="login-wrap">
         <!-- <img class="user-logo" src="../../static/img/zwSound-d.png"> -->
         <div class="ms-title">
-            网络音频播放器管理后台-Dev</div>
+            网络音频播放器管理后台</div>
         <div class="ms-login">
             <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="0px" class="demo-ruleForm">
                 <el-form-item prop="userName">
@@ -32,8 +32,8 @@ export default {
     return {
       notice: "提示 : 默认用户名 admin,密码123456。",
       ruleForm: {
-        userName: "",
-        password: ""
+        userName: "admin",
+        password: "123456"
       },
       rules: {
         userName: [{ required: true, message: "请输入用户名", trigger: "blur" }],
