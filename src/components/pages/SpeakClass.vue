@@ -9,7 +9,7 @@
         <el-switch v-model="item.IsSpeakClass" active-text="播报班名" inactive-text="不报班名">
         </el-switch>
         <div class="row">
-           <span class="lab">语调:</span>
+          <span class="lab">语调:</span>
           <el-select v-model="item.Role" placeholder="请选择" size="small">
             <el-option v-for="item in roles" :key="item.value" :label="item.label" :value="item.value" :disabled="item.disabled">
             </el-option>
@@ -130,7 +130,22 @@
           }
         });
       },
-      delClass(classItem) {},
+      delClass(classItem) {
+        let params = {
+          CMD: "DelClass",
+          ClassID: classItem.ClassID,
+          Token: this.tokenStr
+        };
+        api.Class(params).then(res => {
+          this.$message({
+            showClose: true,
+            message: "该班级刷卡播报设置删除" +
+              (res.Status ? "成功！" : "失败！检查后重试。"),
+            type: res.Status ? "success" : "warning"
+          });
+          this.getSpeakClass("0-15");
+        });
+      },
       saveClass(classItem) {
         let params = {
           CMD: "SetClass",
@@ -162,7 +177,7 @@
     watch: {},
     created() {
       //组件创建完后
-      this.getSpeakClass("0-12");
+      this.getSpeakClass("0-15");
     }
   };
 
