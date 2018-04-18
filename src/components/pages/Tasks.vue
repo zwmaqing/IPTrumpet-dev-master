@@ -407,10 +407,10 @@ export default {
         ? "系统默认任务不能编辑修改."
         : "";
       message =
-        this.theTaskData.Status == "Runing"
+        this.theTaskData.Status == "Running"
           ? "任务正在执行,不能编辑修改,请停止后更改."
           : message;
-      if (this.theTaskData.IsSystem || this.theTaskData.Status == "Runing") {
+      if (this.theTaskData.IsSystem || this.theTaskData.Status == "Running") {
         this.$message({
           message: message,
           type: "warning"
@@ -435,9 +435,15 @@ export default {
       this.returnTask();
     },
     delTask(row) {
-      if (row.IsSystem) {
+      this.getSelectTaskData(row);
+      let message = this.theTaskData.IsSystem ? "系统默认任务不能删除." : "";
+      message =
+        this.theTaskData.Status == "Running"
+          ? "任务正在执行,不能删除,请停止后删除."
+          : message;
+      if (this.theTaskData.IsSystem || this.theTaskData.Status == "Running") {
         this.$message({
-          message: "系统默认任务不能编辑删除",
+          message: message,
           type: "warning"
         });
         return;
@@ -461,6 +467,7 @@ export default {
               //移除此任务
               this.delOneTaskForBuff(row.TaskID);
               this.theTaskData = this.getNewTask();
+              this.theTaskProjects = [];
             } else {
               this.$message({
                 message: "删除该任务失败！请检查后重试。",
@@ -581,10 +588,20 @@ export default {
         api.Task(params).then(res => {
           res.$router = this.$router;
           this.isReloginToDev(res);
+
+          let message = "保存定时任务" + (res.Status ? "成功." : "失败!");
+          if (!res.Status) {
+            if (res.StatusMessage.indexOf("TaskNameOver") > 0) {
+              message += "任务名称与既有任务名重叠!";
+            }
+            if (res.StatusMessage.indexOf("TaskTimeOver") > 0) {
+              message += "任务时间范围与既有任务时段重叠!";
+            }
+          }
+
           this.$message({
             showClose: true,
-            message:
-              "保存定时任务" + (res.Status ? "成功." : "失败!请检查后重试."),
+            message: message,
             type: res.Status ? "success" : "warning"
           });
           //成功状态
@@ -592,7 +609,7 @@ export default {
             this.isTaskChanged = true;
             this.isEditDisabled = true;
             this.isAddNewTask = false;
-            this.returnTask();//如果是手机等小屏浏览，返回任务列表再刷新
+            this.returnTask(); //如果是手机等小屏浏览，返回任务列表再刷新
             this.getTasksTotal();
             this.getTasks({ range: "1-12" });
             if (this.getTaskListCapacity() > 12 && this.taskTotal > 12) {
@@ -633,6 +650,11 @@ export default {
         ProIndex: row.Index,
         Token: this.tokenStr
       };
+
+      this.isProjectLoading = true; //显示loading
+      setTimeout(() => {
+        this.isProjectLoading = false;
+      }, 800);
 
       api.Task(params).then(res => {
         res.$router = this.$router;
